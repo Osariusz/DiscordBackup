@@ -17,5 +17,3 @@ class Reaction():
         await self.copy_users(reaction)
 
         self.emoji = str(reaction.emoji)
-
-        self.__dict__.update()

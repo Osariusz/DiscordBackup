@@ -18,8 +18,32 @@ class Bot(commands.Bot):
         self.add_cog(OwnerCog(self))
         self.load_vars()
 
+    def get_backuped_channel_file_path_no_categories(self, id : int):
+        for channel in self.backuped_channels:
+            if(channel.id == id):
+                return channel.channel_file()
+        for category in self.backuped_categories:
+            if(category.id == id):
+                raise Exception("No categories allowed")
+            for channel in category.channels:
+                if(channel.id == id):
+                    return channel.channel_file(str(category.id))
+        return None
+
+    def get_backuped_channel(self, id: int):
+        for channel in self.backuped_channels:
+            if(channel.id == id):
+                return channel
+        for category in self.backuped_categories:
+            if(id == category.id):
+                return category
+            for channel in category.channels:
+                if(channel.id == id):
+                    return channel
+        return None
+
     def load_vars(self):
-        required_vars = ["allowed_users"]
+        required_vars = ["allowed_users","timezone"]
         for var in required_vars:
             var_path = os.path.join("vars",f"{var}.json")
             if(os.path.isfile(var_path)):
@@ -28,16 +52,10 @@ class Bot(commands.Bot):
 
 
     def check_if_id_present(self, id : int):
-        for channel in self.backuped_channels:
-            if(str(channel.id) == str(id)):
-                return True
-        for category in self.backuped_categories:
-            if(str(category.id) == str(id)):
-                return True
-            for channel in category.channels:
-                if(str(channel.id) == str(id)):
-                    return True
-        return False
+        result = self.get_backuped_channel(id)
+        if(result == None):
+            return False
+        return True
 
     async def try_add_backuped_channel(self, discord_channel):
         id = discord_channel.id

@@ -46,14 +46,16 @@ class Channel():
         start_time = datetime.datetime.now()
         await self.get_channel_messages()
 
-        for message in self.messages:
-            if(len(message.attachments)>0):
-                pass
-
-        
 
         if(not os.path.exists(self.channel_folder(category_path))):
             os.makedirs(str(self.channel_folder(category_path)))
+
+
+        for message in self.messages:
+            if(len(message.attachments)>0):
+                if(not os.path.exists(self.attachments_folder(category_path))):
+                    os.makedirs(self.attachments_folder(category_path))
+                await message.backup_attachments(self.attachments_folder(category_path))
 
         with open(self.channel_file(category_path),"w",encoding="utf-8") as file:
             file.write(json.dumps(self.messages,cls=CustomEncoder))

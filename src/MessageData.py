@@ -2,6 +2,9 @@ from Reaction import Reaction
 import discord
 import asyncio
 from collections import UserDict
+import Attachment
+import datetime
+from zoneinfo import ZoneInfo
 
 class MessageData():
 
@@ -10,7 +13,10 @@ class MessageData():
         await new_reaction.copy_discord_reaction(reaction)
         self.reactions.append(new_reaction)
 
-    async def copy_message_attributes(self, message : discord.Message):
+    def add_attachment(self, attachment_name):
+        self.attachments.append(attachment_name)
+
+    async def copy_message_attributes(self, message : discord.Message, timezone : str):
         self.id = message.id
         self.content = message.content
         self.author_id = message.author.id
@@ -19,8 +25,10 @@ class MessageData():
         for reaction in message.reactions:
             await self.add_reaction(reaction)
             
-        self.created_at = str(message.created_at)
-        self.edited_at = str(message.edited_at)
+        self.created_at = str(message.created_at.astimezone(ZoneInfo(timezone)))
         if(message.edited_at == None):
             self.edited_at = None
+        else:
+            self.edited_at = str(message.edited_at.astimezone(ZoneInfo(timezone)))
+
         self.pinned = message.pinned

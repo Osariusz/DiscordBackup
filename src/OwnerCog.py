@@ -47,7 +47,13 @@ class OwnerCog(commands.Cog):
     async def load_channel(self,ctx, channel_id : int = None):
         if(channel_id == None):
             channel_id = ctx.channel.id
-        channel_file = f"{channel_id}.json"
+        channel = self.bot.get_backuped_channel(int(channel_id))
+        if(channel == None):
+            discord_channel = await self.bot.fetch_channel(channel_id)
+            if(not await self.bot.try_add_backuped_channel(discord_channel)):
+                await ctx.reply(f"Can't load channel {channel_id}")
+                return
+        channel_file = self.bot.get_backuped_channel_file_path_no_categories(channel_id)
         if(os.path.exists(channel_file)):
             channel = Channel(self.bot)
             with open(channel_file,"r",encoding="utf-8") as file:
@@ -55,3 +61,5 @@ class OwnerCog(commands.Cog):
             await channel.send_all_messages(ctx.channel)
         else:
             await ctx.reply(f"There is no backuped channel with id {channel_id}")
+
+    

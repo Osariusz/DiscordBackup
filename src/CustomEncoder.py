@@ -1,6 +1,7 @@
 import json
 from Message import Message
 from Reaction import Reaction
+from Attachment import Attachment
 
 class CustomEncoder(json.JSONEncoder):
 
@@ -9,4 +10,6 @@ class CustomEncoder(json.JSONEncoder):
             return vars(obj.message_data)
         if(isinstance(obj,Reaction)):
             return vars(obj)
+        if(isinstance(obj,Attachment)):
+            return obj.to_json()
         return json.JSONEncoder.default(self,obj)

@@ -1,5 +1,6 @@
 import discord
 from Channel import Channel
+import logging
 
 class Category():
 
@@ -16,8 +17,9 @@ class Category():
             self.channels.append(channel)
 
     async def backup(self):
+        logging.getLogger().info(f"Backuping category {self.id}")
         for channel in self.channels:
             try:
                 await channel.backup(str(self.id))
             except Exception as e:
-                print(f"Can't backup channel {channel.id} in category {self.id} reason: {e}")
+                logging.getLogger().error(f"Can't backup channel {channel.id} in category {self.id} reason: {e}")

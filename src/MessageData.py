@@ -16,12 +16,13 @@ class MessageData():
     def add_attachment(self, attachment_name):
         self.attachments.append(attachment_name)
 
-    async def copy_message_attributes(self, message : discord.Message, timezone : str):
+    async def copy_message_attributes(self, message : discord.Message, timezone : str, thread_messages : list):
         self.id = message.id
         self.content = message.content
         self.author_id = message.author.id
         self.attachments = []
         self.reactions = []
+        self.thread_messages = thread_messages
         for reaction in message.reactions:
             await self.add_reaction(reaction)
             

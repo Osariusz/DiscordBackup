@@ -6,6 +6,7 @@ import asyncio
 import os
 import json
 from Category import Category
+import logging
 
 
 class Bot(commands.Bot):
@@ -78,10 +79,10 @@ class Bot(commands.Bot):
             try:
                 await category.backup()
             except Exception as e:
-                print(f"Couldn't backup category {category.id} reason: {e}")
+                logging.getLogger().error(f"Couldn't backup category {category.id} reason: {e}")
         for channel in self.backuped_channels:
             try:
                 await channel.backup()
             except Exception as e:
-                print(f"Couldn't backup channel {channel.id} reason: {e}")
+                logging.getLogger().error(f"Couldn't backup channel {channel.id} reason: {e}")
 

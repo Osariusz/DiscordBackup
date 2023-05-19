@@ -12,7 +12,18 @@ class Message():
         self.message = message
         self.attachments = message.attachments
         self.message_data = MessageData()
-        await self.message_data.copy_message_attributes(message, self.bot.vars["timezone"])
+
+        thread_messages = []
+        message_thread = message.thread
+        if(message_thread != None):
+            discord_thread_messages = await message_thread.history().flatten()
+            for discord_message in discord_thread_messages:
+                new_message = Message(self.bot)
+                await new_message.copy_from_message(discord_message)
+                thread_messages.append(new_message)
+
+
+        await self.message_data.copy_message_attributes(message, self.bot.vars["timezone"],thread_messages)
 
     def load_message_data(self, json_str):
         self.message_data = json.loads(json_str,object_hook=lambda d: MessageData(**d))

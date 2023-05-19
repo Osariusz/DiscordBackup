@@ -7,8 +7,12 @@ from dotenv import load_dotenv
 import os
 from Bot import Bot
 from OwnerCog import OwnerCog
+import logging
 
 if(__name__ == "__main__"):
+
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Starting bot")
 
     load_dotenv()
 

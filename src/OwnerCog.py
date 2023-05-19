@@ -38,6 +38,7 @@ class OwnerCog(commands.Cog):
     
     @commands.command()
     async def backup_channels(self,ctx):
+        await ctx.reply(f"Starting channels backup")
         start_time = datetime.datetime.now()
         await self.bot.backup_channels()
         end_time = datetime.datetime.now()

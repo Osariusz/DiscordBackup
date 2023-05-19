@@ -5,6 +5,7 @@ import json
 import asyncio
 from CustomEncoder import CustomEncoder
 import datetime
+import logging
 
 class Channel():
 
@@ -15,12 +16,14 @@ class Channel():
 
     async def get_channel_messages(self):
         self.messages = []
-        messages = await self.channel.history(limit=100).flatten()
+        max_python_array_size = 536870912
+        messages = await self.channel.history(limit=max_python_array_size).flatten()
         messages.reverse()
         for discord_message in messages:
             bot_message = Message(self.bot)
             await bot_message.copy_from_message(discord_message)
             self.messages.append(bot_message)
+        logging.getLogger().info(f"Got {len(self.messages)} messages in {self.id}")
 
     def copy_from_channel(self, channel : discord.TextChannel):
         self.channel = channel
@@ -43,6 +46,7 @@ class Channel():
             self.add_message(message)
 
     async def backup(self, category_path=""):
+        logging.getLogger().info(f"Backuping channel {self.id}")
         start_time = datetime.datetime.now()
         await self.get_channel_messages()
 
@@ -61,7 +65,7 @@ class Channel():
             file.write(json.dumps(self.messages,cls=CustomEncoder))
 
         end_time = datetime.datetime.now()
-        print(f"Backuped channel {self.id} in {end_time-start_time}")
+        logging.getLogger().info(f"Backuped channel {self.id} in {end_time-start_time}")
 
     def channel_folder(self,category_path=""):
         return os.path.join("backups",f"{self.server_id}",f"{category_path}",f"{self.id}")

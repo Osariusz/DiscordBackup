@@ -13,6 +13,7 @@ class Message():
         self.attachments = message.attachments
         self.message_data = MessageData()
 
+
         thread_messages = []
         message_thread = message.thread
         if(message_thread != None):

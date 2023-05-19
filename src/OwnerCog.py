@@ -37,6 +37,16 @@ class OwnerCog(commands.Cog):
             await ctx.reply(f"Failed to add {channel_id}")
     
     @commands.command()
+    async def list_channels(self, ctx):
+        result = "backuped_channels: "
+        for channel in self.bot.backuped_channels:
+            result += f"{channel.id} "
+        result += "\nbackuped categories: "
+        for category in self.bot.backuped_categories:
+            result += f"{category.id} " 
+        await ctx.reply(result)
+
+    @commands.command()
     async def backup_channels(self,ctx):
         await ctx.reply(f"Starting channels backup")
         start_time = datetime.datetime.now()

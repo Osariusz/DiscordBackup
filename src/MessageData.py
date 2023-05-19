@@ -25,6 +25,10 @@ class MessageData():
         self.thread_messages = thread_messages
         for reaction in message.reactions:
             await self.add_reaction(reaction)
+
+        messageReference = message.reference
+        if(not messageReference == None):
+            self.referenced_message = messageReference.message_id
             
         self.created_at = str(message.created_at.astimezone(ZoneInfo(timezone)))
         if(message.edited_at == None):

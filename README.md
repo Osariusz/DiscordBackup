@@ -1,5 +1,5 @@
 # DiscordBackup
-Backs up messages in a discord server
+Backs up all messages in a discord server with attachments!
 
 ## Slash Commands
 

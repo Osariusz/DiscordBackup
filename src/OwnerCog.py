@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord.ext import commands
 import os
@@ -67,7 +69,11 @@ class OwnerCog(commands.Cog):
         else:
             await ctx.respond(f"Failed to remove {channel_id}")
 
-            
+    @discord.command()
+    async def remove_all_channels(self, ctx: discord.ApplicationContext):
+        logging.getLogger().info("Removing all channels")
+        await self.bot.remove_all_channels()
+        await ctx.respond("Removed all channels")
 
 
 

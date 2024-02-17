@@ -35,7 +35,7 @@ class Bot(commands.Bot):
         channel = self.get_backuped_channel(id)
         return await self.remove_channel(channel)
 
-    async def remove_channel(self, channel):
+    async def get_remove_result(self, channel) -> bool:
         if(channel == None):
             logging.getLogger().error(f"No channel with id {channel.id}")
             return False
@@ -52,7 +52,15 @@ class Bot(commands.Bot):
                     self.backuped_channels.remove(channel)
                     break
             return True
+    async def remove_channel(self, channel) -> bool:
+        result = await self.get_remove_result(channel)
+        self.update_backuped_var()
+        return result
 
+    async def remove_all_channels(self):
+        self.backuped_channels.clear()
+        self.backuped_categories.clear()
+        self.update_backuped_var()
 
     def get_backuped_channel_file_path_no_categories(self, id : int):
         for channel in self.backuped_channels:

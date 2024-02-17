@@ -1,6 +1,10 @@
 # DiscordBackup
 Backs up all messages in a discord server with attachments!
 
+## Limits:
+- Can't backup more than 536,870,912 messages in a single channel (python array size limit for a 32-bit system i implemented in get_channel_messages method).
+- Can't copy contents of forum channels (will implement them later)
+
 ## Slash Commands
 
 ### `/add_channel [channel_id]`

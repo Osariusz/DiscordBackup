@@ -106,8 +106,10 @@ class OwnerCog(commands.Cog):
         end_time = datetime.datetime.now()
         await ctx.respond(f"Channels backup completed in {end_time-start_time}")
 
-    @discord.command()
+    #@discord.command()
     async def load_channel(self,ctx: discord.ApplicationContext, channel_id : str = None):
+        # TODO: fix loading channels
+        return
         if(channel_id == None):
             channel_id = ctx.channel.id
 

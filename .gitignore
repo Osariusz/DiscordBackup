@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 #backup bot
-vars/
+vars/*.json
 backups/
 
 # jetbrains

@@ -150,6 +150,7 @@ class Bot(commands.Bot):
     async def try_add_backuped_channel(self, discord_channel):
         id = discord_channel.id
         if(self.check_if_id_present(id)):
+            logging.info(f"Id already present {id}")
             return False
         if(isinstance(discord_channel,discord.CategoryChannel)):
             bot_category = Category(self)

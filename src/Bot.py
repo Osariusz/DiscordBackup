@@ -1,3 +1,4 @@
+import datetime
 from time import sleep
 from tokenize import String
 import discord
@@ -107,6 +108,10 @@ class Bot(commands.Bot):
         asyncio.ensure_future(self.load_backuped_ids())
         logging.getLogger().info("Vars loaded")
 
+
+    def set_start_date(self, start_date: datetime.datetime):
+        self.vars["start_date"] = start_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.update_var("start_date")
 
     def update_backuped_var(self):
         self.vars["backuped_channels"] = [channel.id for channel in self.backuped_channels]

@@ -15,6 +15,7 @@ class Channel():
         self.server_id = 0
 
     async def get_channel_messages(self):
+        # TODO: Add limiting messages to after the last start date
         self.messages = []
         max_python_array_size = 536870912
         messages = await self.channel.history(limit=max_python_array_size).flatten()

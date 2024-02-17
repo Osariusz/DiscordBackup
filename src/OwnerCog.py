@@ -17,7 +17,7 @@ class OwnerCog(commands.Cog):
     async def cog_check(self,ctx: discord.ApplicationContext):
         result = ctx.author.id in self.bot.vars["allowed_users"]
         if(not result):
-            await ctx.respond("You are not allowed to use this command")
+            await ctx.respond("You are not allowed to use this command", ephemeral=True)
         return result
 
     @discord.command()

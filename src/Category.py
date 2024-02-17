@@ -11,6 +11,7 @@ class Category():
 
     def copy_from_category(self, category : discord.CategoryChannel):
         self.id = category.id
+        self.name = category.name
         for discord_channel in category.channels:
             channel = Channel(self.bot)
             channel.copy_from_channel(discord_channel)

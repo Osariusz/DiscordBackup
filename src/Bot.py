@@ -14,7 +14,7 @@ import logging
 class Bot(commands.Bot):
 
     def __init__(self,intents):
-        super().__init__(command_prefix="$",intents=intents)
+        super().__init__(intents=intents)
         self.loaded_vars = False
         self.backuped_channels = []
         self.backuped_categories = []
@@ -25,6 +25,34 @@ class Bot(commands.Bot):
         if(not self.loaded_vars):
             self.load_vars()
             self.loaded_vars = True
+
+    async def translate_category_to_channels(self, category : discord.CategoryChannel):
+        self.backuped_categories.remove(category)
+        await self.add_channels_to_backups(category.channels)
+
+
+    async def remove_channel_id(self, id):
+        channel = self.get_backuped_channel(id)
+        return await self.remove_channel(channel)
+
+    async def remove_channel(self, channel):
+        if(channel == None):
+            logging.getLogger().error(f"No channel with id {channel.id}")
+            return False
+        if(channel in self.backuped_channels):
+            self.backuped_channels.remove(channel)
+            return True
+        elif(channel in self.backuped_categories):
+            self.backuped_categories.remove(channel)
+            return True
+        else:
+            for category in self.backuped_categories:
+                if(channel in category.channels):
+                    await self.translate_category_to_channels(category)
+                    self.backuped_channels.remove(channel)
+                    break
+            return True
+
 
     def get_backuped_channel_file_path_no_categories(self, id : int):
         for channel in self.backuped_channels:
@@ -93,6 +121,20 @@ class Bot(commands.Bot):
             return False
         return True
 
+    async def add_channels_to_backups(self, channels : list):
+        try:
+            for channel in channels:
+                if(not isinstance(channel, Channel)):
+                    raise Exception("add_channel_to_backups takes Channel type only")
+                elif(channel in self.backuped_channels):
+                    logging.getLogger().warn(f"Channel {channel.id} already in backuped_channels")
+                else:
+                    self.backuped_channels.append(channel)
+            self.update_var("backuped_channels")
+        except Exception as e:
+            logging.getLogger().exception(str(e))
+
+
     async def try_add_backuped_id(self, id):
         try:
             id = int(id)
@@ -100,8 +142,10 @@ class Bot(commands.Bot):
             added = await self.try_add_backuped_channel(discord_channel)
             if(not added):
                 logging.getLogger().warn(f"Failed to add backuped id: {id}")
+            return added
         except Exception as e:
             logging.getLogger().warn(f"Failed to fetch channel with backuped id: {id} {e}")
+            return False
 
     async def try_add_backuped_channel(self, discord_channel):
         id = discord_channel.id
@@ -119,6 +163,8 @@ class Bot(commands.Bot):
             self.backuped_channels.append(bot_channel)
             self.update_backuped_var()
             return True
+        elif(isinstance(discord_channel, Channel) or isinstance(discord_channel, Category)):
+            raise Exception("try_add_backuped_channels inputs discord types")
         return False
 
     async def backup_channels(self):

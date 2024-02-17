@@ -131,3 +131,6 @@ dmypy.json
 #backup bot
 vars/
 backups/
+
+# jetbrains
+.idea/

@@ -21,3 +21,19 @@ Lists all backed up channels by their names.
 
 ### `/backup_channels`
 Starts the backup process. This command retrieves all messages and media from the backed up channels and outputs them into a local folder.
+
+## Variables
+
+The currently working variables in this bot are stored as JSON files and work as follows:
+
+### `allowed_users.json`
+This is a list of user IDs that are allowed to execute commands.
+
+### `backuped_categories.json`
+This is a list of IDs for the categories that have been backed up.
+
+### `backuped_channels.json`
+This is a list of IDs for the channels that have been backed up.
+
+### `timezone.json`
+This is your timezone. It's used to ensure that timestamps and other time-related data are accurate for your location.

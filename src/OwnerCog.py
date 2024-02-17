@@ -104,7 +104,8 @@ class OwnerCog(commands.Cog):
         start_time = datetime.datetime.now()
         await self.bot.backup_channels()
         end_time = datetime.datetime.now()
-        self.bot.set_start_date(start_time)
+        if self.bot.get_start_date_update_after_backup():
+            self.bot.set_start_date(start_time)
         await ctx.respond(f"Channels backup completed in {end_time-start_time}")
 
     #@discord.command()

@@ -108,8 +108,10 @@ class Bot(commands.Bot):
         asyncio.ensure_future(self.load_backuped_ids())
         logging.getLogger().info("Vars loaded")
 
+    def get_start_date_update_after_backup(self) -> bool:
+        return self.vars["increase_start_date_after_backup"] == "True"
 
-    def set_start_date(self, start_date: datetime.datetime):
+    def set_start_date(self, start_date: datetime.datetime) -> None:
         self.vars["start_date"] = start_date.strftime("%Y-%m-%d %H:%M:%S")
         self.update_var("start_date")
 

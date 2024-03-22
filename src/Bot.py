@@ -107,10 +107,13 @@ class Bot(commands.Bot):
     def load_vars(self):
         required_vars = ["allowed_users","timezone"]
         for var in [file[0:file.find(".json")] for file in os.listdir("vars") if os.path.isfile(os.path.join("vars",file))]:
-            var_path = os.path.join("vars",f"{var}.json")
-            if(os.path.isfile(var_path)):
-                with open(var_path,"r",encoding="utf-8") as file:
-                    self.vars[var.replace(".json","")] = json.load(file)
+            try:
+                var_path = os.path.join("vars",f"{var}.json")
+                if(os.path.isfile(var_path)):
+                    with open(var_path,"r",encoding="utf-8") as file:
+                        self.vars[var.replace(".json","")] = json.load(file)
+            except Exception as e:
+                logging.getLogger().error(str(e))
         for required_var in required_vars:
             if(not required_var in self.vars):
                 logging.getLogger().error(f"Var {required_var} not present in var dictionary!")

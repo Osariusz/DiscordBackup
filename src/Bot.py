@@ -1,4 +1,5 @@
 import datetime
+import shutil
 from time import sleep
 from tokenize import String
 import discord
@@ -24,6 +25,7 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         if(not self.loaded_vars):
+            self.initialize_var_files()
             self.load_vars()
             self.loaded_vars = True
 
@@ -94,6 +96,13 @@ class Bot(commands.Bot):
         if("backuped_categories" in self.vars):
             for category_id in self.vars["backuped_categories"]:
                 await self.try_add_backuped_id(category_id)
+
+    def initialize_var_files(self):
+        for file in os.listdir("vars"):
+            file = os.path.join("vars", file)
+            real_file_name: str = file.replace(".example", "")
+            if(file.endswith(".example") and not os.path.exists(real_file_name)):
+                shutil.copy(file, real_file_name)
 
     def load_vars(self):
         required_vars = ["allowed_users","timezone"]

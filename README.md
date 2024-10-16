@@ -37,3 +37,6 @@ This is a list of IDs for the channels that have been backed up.
 
 ### `timezone.json`
 This is your timezone. It's used to ensure that timestamps and other time-related data are accurate for your location.
+
+### `backup_path.json`
+Path where backuped files should be stored

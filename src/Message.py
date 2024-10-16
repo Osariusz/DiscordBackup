@@ -16,7 +16,7 @@ class Message():
 
         thread_messages = []
         message_thread = message.thread
-        if(message_thread != None):
+        if(message_thread is not None):
             discord_thread_messages = await message_thread.history().flatten()
             for discord_message in discord_thread_messages:
                 new_message = Message(self.bot)

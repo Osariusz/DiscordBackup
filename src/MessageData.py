@@ -21,19 +21,19 @@ class MessageData():
         self.content = message.content
         self.author_id = message.author.id
         self.attachments: list[discord.Attachment] = []
-        self.reactions = list[discord.Reaction]
+        self.reactions: list[discord.Reaction] = []
         self.thread_messages = thread_messages
         for reaction in message.reactions:
             await self.add_reaction(reaction)
 
         messageReference = message.reference
-        if(not messageReference == None):
+        if(messageReference is not None):
             self.referenced_message = messageReference.message_id
             
         self.created_at = str(message.created_at.astimezone(ZoneInfo(timezone)))
         if(message.edited_at == None):
             self.edited_at = None
-        else:
+        elif message.edited_at is not None:
             self.edited_at = str(message.edited_at.astimezone(ZoneInfo(timezone)))
 
         self.pinned = message.pinned

@@ -13,9 +13,10 @@ class Category():
         self.id = category.id
         self.name = category.name
         for discord_channel in category.channels:
-            channel = Channel(self.bot)
-            channel.copy_from_channel(discord_channel)
-            self.channels.append(channel)
+            if isinstance(discord_channel, discord.TextChannel):
+                channel = Channel(self.bot)
+                channel.copy_from_channel(discord_channel)
+                self.channels.append(channel)
 
     async def backup(self):
         logging.getLogger().info(f"Backuping category {self.id}")

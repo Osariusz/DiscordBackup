@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -14,15 +16,16 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def cog_check(self,ctx: discord.ApplicationContext):
+    def cog_check(self, ctx: discord.ApplicationContext) -> bool:
         result = ctx.author.id in self.bot.vars["allowed_users"]
-        if(not result):
-            await ctx.respond("You are not allowed to use this command", ephemeral=True)
+        if not result:
+            asyncio.create_task(ctx.respond("You are not allowed to use this command", ephemeral=True))
         return result
 
     @discord.command()
-    async def add_channel(self,ctx: discord.ApplicationContext,channel_id : str = None):
-        if(channel_id == None):
+    async def add_channel(self,ctx: discord.ApplicationContext,channel_id_str : Optional[str]):
+        channel_id: int
+        if(channel_id_str is None):
             channel_id = ctx.channel.id
 
         channel_id = int(channel_id)
@@ -41,8 +44,9 @@ class OwnerCog(commands.Cog):
             await ctx.respond(f"Failed to add {channel_id}")
     
     @discord.command()
-    async def remove_channel(self, ctx: discord.ApplicationContext, channel_id : str = None):
-        if(channel_id == None):
+    async def remove_channel(self, ctx: discord.ApplicationContext, channel_id_str : Optional[str]):
+        channel_id: int
+        if(channel_id_str == None):
             channel_id = ctx.channel_id
 
         channel_id = int(channel_id)
@@ -109,7 +113,7 @@ class OwnerCog(commands.Cog):
         await ctx.respond(f"Channels backup completed in {end_time-start_time}")
 
     #@discord.command()
-    async def load_channel(self,ctx: discord.ApplicationContext, channel_id : str = None):
+    async def load_channel(self,ctx: discord.ApplicationContext, channel_id : Optional[str]):
         # TODO: fix loading channels
         return
         if(channel_id == None):

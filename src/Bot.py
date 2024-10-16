@@ -12,14 +12,7 @@ import json
 from Category import Category
 import logging
 from enum import Enum
-
-class VariableTypeEnum:
-    ALLOWED_USERS = "allowed_users"
-    BACKUPED_CATEGORIES = "backuped_categories"
-    BACKUPED_CHANNELS = "backuped_channels"
-    INCREASE_START_DATE_AFTER_BACKUP = "increase_start_date_after_backup"
-    START_DATE = "start_date"
-    TIMEZONE = "timezone"
+from VariableTypeEnum import VariableTypeEnum
 
 class Bot(commands.Bot):
 

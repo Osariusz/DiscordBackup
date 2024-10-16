@@ -2,17 +2,17 @@ import discord
 from MessageData import MessageData
 import json
 from Attachment import Attachment
+from VariableTypeEnum import VariableTypeEnum
 
 class Message():
 
-    def __init__(self, bot : discord.Client):
+    def __init__(self, bot):
         self.bot = bot
 
     async def copy_from_message(self, message : discord.Message):
         self.message = message
         self.attachments = message.attachments
         self.message_data = MessageData()
-
 
         thread_messages = []
         message_thread = message.thread
@@ -24,7 +24,7 @@ class Message():
                 thread_messages.append(new_message)
 
 
-        await self.message_data.copy_message_attributes(message, self.bot.vars["timezone"],thread_messages)
+        await self.message_data.copy_message_attributes(message, str(self.bot.vars[VariableTypeEnum.TIMEZONE]),thread_messages)
 
     def load_message_data(self, json_str):
         self.message_data = json.loads(json_str,object_hook=lambda d: MessageData(**d))

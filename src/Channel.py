@@ -46,14 +46,14 @@ class Channel():
             message.load_message_data(json.dumps(message_data))
             self.add_message(message)
 
-    async def backup(self, category_path=""):
+    async def backup(self, category_path="", backups_path="backups"):
         logging.getLogger().info(f"Backuping channel {self.id}")
         start_time = datetime.datetime.now()
         await self.get_channel_messages()
 
 
-        if(not os.path.exists(self.channel_folder(category_path))):
-            os.makedirs(str(self.channel_folder(category_path)))
+        if(not os.path.exists(self.channel_folder(category_path, backups_path))):
+            os.makedirs(str(self.channel_folder(category_path, backups_path)))
 
 
         for message in self.messages:
@@ -68,8 +68,8 @@ class Channel():
         end_time = datetime.datetime.now()
         logging.getLogger().info(f"Backuped channel {self.id} in {end_time-start_time}")
 
-    def channel_folder(self,category_path=""):
-        return os.path.join("backups",f"{self.server_id}",f"{category_path}",f"{self.id}")
+    def channel_folder(self,category_path="", backups_path="backups"):
+        return os.path.join(backups_path,f"{self.server_id}",f"{category_path}",f"{self.id}")
 
     def channel_file(self,category_path=""):
         return os.path.join(self.channel_folder(category_path),f"{self.id}.json")

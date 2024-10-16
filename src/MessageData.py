@@ -20,8 +20,8 @@ class MessageData():
         self.id = message.id
         self.content = message.content
         self.author_id = message.author.id
-        self.attachments = []
-        self.reactions = []
+        self.attachments: list[discord.Attachment] = []
+        self.reactions = list[discord.Reaction]
         self.thread_messages = thread_messages
         for reaction in message.reactions:
             await self.add_reaction(reaction)

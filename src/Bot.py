@@ -11,7 +11,15 @@ import os
 import json
 from Category import Category
 import logging
+from enum import Enum
 
+class VariableTypeEnum:
+    ALLOWED_USERS = "allowed_users"
+    BACKUPED_CATEGORIES = "backuped_categories"
+    BACKUPED_CHANNELS = "backuped_channels"
+    INCREASE_START_DATE_AFTER_BACKUP = "increase_start_date_after_backup"
+    START_DATE = "start_date"
+    TIMEZONE = "timezone"
 
 class Bot(commands.Bot):
 
@@ -20,7 +28,7 @@ class Bot(commands.Bot):
         self.loaded_vars = False
         self.backuped_channels = []
         self.backuped_categories = []
-        self.vars = {}
+        self.vars: dict[str, object] = {}
         self.add_cog(OwnerCog(self))
 
     async def on_ready(self):
@@ -90,11 +98,11 @@ class Bot(commands.Bot):
         return None
 
     async def load_backuped_ids(self):
-        if("backuped_channels" in self.vars):
-            for channel_id in self.vars["backuped_channels"]:
+        if(VariableTypeEnum.BACKUPED_CHANNELS in self.vars):
+            for channel_id in self.vars[VariableTypeEnum.BACKUPED_CHANNELS]:
                 await self.try_add_backuped_id(channel_id)
-        if("backuped_categories" in self.vars):
-            for category_id in self.vars["backuped_categories"]:
+        if(VariableTypeEnum.BACKUPED_CATEGORIES in self.vars):
+            for category_id in self.vars[VariableTypeEnum.BACKUPED_CATEGORIES]:
                 await self.try_add_backuped_id(category_id)
 
     def initialize_var_files(self):
@@ -105,7 +113,7 @@ class Bot(commands.Bot):
                 shutil.copy(file, real_file_name)
 
     def load_vars(self):
-        required_vars = ["allowed_users","timezone"]
+        required_vars = [VariableTypeEnum.ALLOWED_USERS, VariableTypeEnum.TIMEZONE]
         for var in [file[0:file.find(".json")] for file in os.listdir("vars") if os.path.isfile(os.path.join("vars",file))]:
             try:
                 var_path = os.path.join("vars",f"{var}.json")
@@ -121,17 +129,17 @@ class Bot(commands.Bot):
         logging.getLogger().info("Vars loaded")
 
     def get_start_date_update_after_backup(self) -> bool:
-        return self.vars["increase_start_date_after_backup"] == "True"
+        return self.vars[VariableTypeEnum.INCREASE_START_DATE_AFTER_BACKUP] == "True"
 
     def set_start_date(self, start_date: datetime.datetime) -> None:
-        self.vars["start_date"] = start_date.strftime("%Y-%m-%d %H:%M:%S")
-        self.update_var("start_date")
+        self.vars[VariableTypeEnum.START_DATE] = start_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.update_var(VariableTypeEnum.START_DATE)
 
     def update_backuped_var(self):
-        self.vars["backuped_channels"] = [channel.id for channel in self.backuped_channels]
-        self.vars["backuped_categories"] = [category.id for category in self.backuped_categories]
-        self.update_var("backuped_channels")
-        self.update_var("backuped_categories")
+        self.vars[VariableTypeEnum.BACKUPED_CHANNELS] = [channel.id for channel in self.backuped_channels]
+        self.vars[VariableTypeEnum.BACKUPED_CATEGORIES] = [category.id for category in self.backuped_categories]
+        self.update_var(VariableTypeEnum.BACKUPED_CHANNELS)
+        self.update_var(VariableTypeEnum.BACKUPED_CATEGORIES)
 
     def update_var(self, name : str):
         if(not name in self.vars):

@@ -5,3 +5,4 @@ class VariableTypeEnum:
     INCREASE_START_DATE_AFTER_BACKUP = "increase_start_date_after_backup"
     START_DATE = "start_date"
     TIMEZONE = "timezone"
+    BACKUP_PATH = "backup_path"

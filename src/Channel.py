@@ -9,10 +9,11 @@ import logging
 
 class Channel():
 
-    def __init__(self, bot):
-        self.messages = []
+    def __init__(self, bot, backups_path: str):
+        self.messages: list[Message] = []
         self.bot = bot
         self.server_id = 0
+        self.backups_path = backups_path
 
     async def get_channel_messages(self):
         # TODO: Add limiting messages to after the last start date
@@ -46,14 +47,14 @@ class Channel():
             message.load_message_data(json.dumps(message_data))
             self.add_message(message)
 
-    async def backup(self, category_path="", backups_path="backups"):
+    async def backup(self, category_path=""):
         logging.getLogger().info(f"Backuping channel {self.id}")
         start_time = datetime.datetime.now()
         await self.get_channel_messages()
 
 
-        if(not os.path.exists(self.channel_folder(category_path, backups_path))):
-            os.makedirs(str(self.channel_folder(category_path, backups_path)))
+        if(not os.path.exists(self.channel_folder(category_path=category_path))):
+            os.makedirs(str(self.channel_folder(category_path=category_path)))
 
 
         for message in self.messages:
@@ -68,11 +69,11 @@ class Channel():
         end_time = datetime.datetime.now()
         logging.getLogger().info(f"Backuped channel {self.id} in {end_time-start_time}")
 
-    def channel_folder(self,category_path="", backups_path="backups"):
-        return os.path.join(backups_path,f"{self.server_id}",f"{category_path}",f"{self.id}")
+    def channel_folder(self,category_path=""):
+        return os.path.join(self.backups_path,f"{self.server_id}",f"{category_path}",f"{self.id}")
 
-    def channel_file(self,category_path=""):
-        return os.path.join(self.channel_folder(category_path),f"{self.id}.json")
+    def channel_file(self ,category_path=""):
+        return os.path.join(self.channel_folder(category_path=category_path),f"{self.id}.json")
 
     def attachments_folder(self,category_path=""):
-        return os.path.join(self.channel_folder(category_path),"attachments")
+        return os.path.join(self.channel_folder(category_path=category_path),"attachments")

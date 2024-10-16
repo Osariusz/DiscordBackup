@@ -27,8 +27,8 @@ class OwnerCog(commands.Cog):
         channel_id: int
         if(channel_id_str is None):
             channel_id = ctx.channel.id
-
-        channel_id = int(channel_id)
+        else:
+            channel_id = int(channel_id_str)
 
         success = await self.bot.try_add_backuped_id(channel_id)
         if(success):
@@ -46,10 +46,10 @@ class OwnerCog(commands.Cog):
     @discord.command()
     async def remove_channel(self, ctx: discord.ApplicationContext, channel_id_str : Optional[str]):
         channel_id: int
-        if(channel_id_str == None):
+        if(channel_id_str is None):
             channel_id = ctx.channel_id
-
-        channel_id = int(channel_id)
+        else:
+            channel_id = int(channel_id)
 
         channel = self.bot.get_backuped_channel(channel_id)
         if(channel == None):

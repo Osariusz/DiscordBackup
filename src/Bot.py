@@ -181,13 +181,13 @@ class Bot(commands.Bot):
             logging.info(f"Id already present {id}")
             return False
         if(isinstance(discord_channel,discord.CategoryChannel)):
-            bot_category = Category(self)
+            bot_category = Category(self, self.vars[VariableTypeEnum.BACKUP_PATH])
             bot_category.copy_from_category(discord_channel)
             self.backuped_categories.append(bot_category)
             self.update_backuped_var()
             return True
         elif(isinstance(discord_channel,discord.TextChannel)):
-            bot_channel = Channel(self)
+            bot_channel = Channel(self, self.vars[VariableTypeEnum.BACKUP_PATH])
             bot_channel.copy_from_channel(discord_channel)
             self.backuped_channels.append(bot_channel)
             self.update_backuped_var()

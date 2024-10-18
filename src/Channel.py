@@ -52,7 +52,6 @@ class Channel():
         start_time = datetime.datetime.now()
         await self.get_channel_messages()
 
-
         if(not os.path.exists(self.channel_folder(category_path=category_path))):
             os.makedirs(str(self.channel_folder(category_path=category_path)))
 

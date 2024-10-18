@@ -63,8 +63,8 @@ class Channel():
                     os.makedirs(self.attachments_folder(category_path))
                 await message.backup_attachments(self.attachments_folder(category_path))
 
-        with open(self.channel_file(category_path),"w",encoding="utf-8") as file:
-            file.write(json.dumps(self.messages,cls=CustomEncoder))
+        with open(self.channel_file(category_path),"w", encoding="utf-8") as file:
+            file.write(json.dumps(self.messages,cls=CustomEncoder, ensure_ascii=False))
 
         end_time = datetime.datetime.now()
         logging.getLogger().info(f"Backuped channel {self.id} in {end_time-start_time}")

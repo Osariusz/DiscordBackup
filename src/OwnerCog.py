@@ -139,7 +139,7 @@ class OwnerCog(commands.Cog):
     @discord.command()
     async def check_channels_count(self, ctx):
         not_found_channels = await self.bot.check_channels(ctx)
-        await ctx.respond(f"Number of channels not backuped: {len(not_found_channels)}")
+        await ctx.send(f"Number of channels not backuped: {len(not_found_channels)}")
 
     @discord.command()
     async def set_channels_to_not_backuped(self, ctx):

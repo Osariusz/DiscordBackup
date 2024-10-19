@@ -185,7 +185,8 @@ class Bot(commands.Bot):
     async def refresh_backuped_channels(self, ctx):
         await self.remove_all_channels()
         not_found_channels = await self.check_channels(ctx)
-        self.backuped_channels = not_found_channels
+        for channel in not_found_channels:
+            self.try_add_backuped_channel(channel)
         logging.getLogger().info(f"Backup channels refreshed. New backuped channels: {[channel.name for channel in not_found_channels]}")
 
     async def try_add_backuped_id(self, id):

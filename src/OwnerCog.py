@@ -87,11 +87,11 @@ class OwnerCog(commands.Cog):
             if split_index == -1:
                 split_index = 2000
             
-            await ctx.respond(message[:split_index])
+            await ctx.send(message[:split_index])
             message = message[split_index:].lstrip() 
 
         if message:
-            await ctx.respond(message)
+            await ctx.send(message)
 
     @discord.command()
     async def list_channels(self, ctx: discord.ApplicationContext):

@@ -34,7 +34,6 @@ class Bot(commands.Bot):
         self.backuped_categories.remove(category)
         await self.add_channels_to_backups(category.channels)
 
-
     async def remove_channel_id(self, id):
         channel = self.get_backuped_channel(id)
         return await self.remove_channel(channel)
@@ -56,6 +55,7 @@ class Bot(commands.Bot):
                     self.backuped_channels.remove(channel)
                     break
             return True
+        
     async def remove_channel(self, channel) -> bool:
         result = await self.get_remove_result(channel)
         self.update_backuped_var()
@@ -162,6 +162,31 @@ class Bot(commands.Bot):
         except Exception as e:
             logging.getLogger().exception(str(e))
 
+    def channel_backuped(self, channel_id : str):
+        target_filename = f"{channel_id}.json"
+        
+        for root, dirs, files in os.walk(str(self.vars[VariableTypeEnum.BACKUP_PATH])):
+            if target_filename in files:
+                return True
+
+        return False
+
+    async def check_channels(self, ctx) -> list[discord.TextChannel]:
+        not_found_channels = []
+
+        for channel in ctx.guild.channels:
+            if isinstance(channel, discord.TextChannel):
+                channel_id = str(channel.id)
+                if not self.channel_backuped(channel_id):
+                    not_found_channels.append(channel)
+
+        return not_found_channels
+    
+    async def refresh_backuped_channels(self, ctx):
+        await self.remove_all_channels()
+        not_found_channels = await self.check_channels(ctx)
+        self.backuped_channels = not_found_channels
+        logging.getLogger().info(f"Backup channels refreshed. New backuped channels: {[channel.name for channel in not_found_channels]}")
 
     async def try_add_backuped_id(self, id):
         try:

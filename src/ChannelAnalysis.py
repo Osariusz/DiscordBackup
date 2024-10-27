@@ -9,15 +9,14 @@ from VarsManager import VarsManager
 
 class ChannelAnalysis():
 
-    def __init__(self, channel_ids: list[str]):
+    def __init__(self):
         self.vars_manager = VarsManager()
-        self.initialize_channel_analysis(channel_ids)
+        self.initialize_channel_analysis()
 
-    def initialize_channel_analysis(self, channel_ids: list[str]):
+    def initialize_channel_analysis(self):
         self.channels_messages: dict[Channel, list[Message]] = {}
-        for channel_id in channel_ids:
+        for channel_id, channel_json in self.get_from_all_channels().items():
             channel: Channel = Channel(None, str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH]))
-            channel_json: str = self.get_from_channel_id(channel_id)
             channel.id = int(channel_id)
             channel.load_messages(channel_json)
             self.channels_messages[channel] = channel.messages
@@ -38,6 +37,20 @@ class ChannelAnalysis():
         
         print(f"File {filename} not found")
         return ""
+    
+    def get_from_all_channels(self) -> dict[str, str]:
+        result: dict[str, str] = {}
+        for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
+            for file in files:
+                name_split = os.path.splitext(file)
+                if(name_split[1] == ".json"):
+                    file_path = os.path.join(root, file)
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as json_file:
+                            result[name_split[0]] = json_file.read()
+                    except Exception as e:
+                        print(f"Error reading {file_path}: {e}")
+        return result
         
     def initialize_messages_df(self):
         all_messages = []

@@ -3,6 +3,7 @@ from MessageData import MessageData
 import json
 from Attachment import Attachment
 from VariableTypeEnum import VariableTypeEnum
+from types import SimpleNamespace
 
 class Message():
 
@@ -27,7 +28,7 @@ class Message():
         await self.message_data.copy_message_attributes(message, str(self.bot.vars[VariableTypeEnum.TIMEZONE]),thread_messages)
 
     def load_message_data(self, json_str):
-        self.message_data = json.loads(json_str,object_hook=lambda d: MessageData(**d))
+        self.message_data = json.loads(json_str,object_hook=lambda d: SimpleNamespace(**d))
 
     async def backup_attachments(self, channel_attachments_path):
         for discord_attachment in self.attachments:

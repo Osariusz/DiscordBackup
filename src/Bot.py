@@ -13,22 +13,17 @@ from Category import Category
 import logging
 from enum import Enum
 from VariableTypeEnum import VariableTypeEnum
+import VarsManager
 
 class Bot(commands.Bot):
 
     def __init__(self,intents):
         super().__init__(intents=intents)
-        self.loaded_vars = False
+        self.vars_manager = VarsManager()
+        asyncio.ensure_future(self.load_backuped_ids())
         self.backuped_channels = []
         self.backuped_categories = []
-        self.vars: dict[str, object] = {}
         self.add_cog(OwnerCog(self))
-
-    async def on_ready(self):
-        if(not self.loaded_vars):
-            self.initialize_var_files()
-            self.load_vars()
-            self.loaded_vars = True
 
     async def translate_category_to_channels(self, category : discord.CategoryChannel):
         self.backuped_categories.remove(category)
@@ -98,50 +93,18 @@ class Bot(commands.Bot):
             for category_id in self.vars[VariableTypeEnum.BACKUPED_CATEGORIES]:
                 await self.try_add_backuped_id(category_id)
 
-    def initialize_var_files(self):
-        for file in os.listdir("vars"):
-            file = os.path.join("vars", file)
-            real_file_name: str = file.replace(".example", "")
-            if(file.endswith(".example") and not os.path.exists(real_file_name)):
-                shutil.copy(file, real_file_name)
-
-    def load_vars(self):
-        required_vars = [VariableTypeEnum.ALLOWED_USERS, VariableTypeEnum.TIMEZONE]
-        for var in [file[0:file.find(".json")] for file in os.listdir("vars") if os.path.isfile(os.path.join("vars",file))]:
-            try:
-                var_path = os.path.join("vars",f"{var}.json")
-                if(os.path.isfile(var_path)):
-                    with open(var_path,"r",encoding="utf-8") as file:
-                        self.vars[var.replace(".json","")] = json.load(file)
-            except Exception as e:
-                logging.getLogger().error(str(e))
-        for required_var in required_vars:
-            if(not required_var in self.vars):
-                logging.getLogger().error(f"Var {required_var} not present in var dictionary!")
-        asyncio.ensure_future(self.load_backuped_ids())
-        logging.getLogger().info("Vars loaded")
-
     def get_start_date_update_after_backup(self) -> bool:
-        return self.vars[VariableTypeEnum.INCREASE_START_DATE_AFTER_BACKUP] == "True"
+        return self.vars_manager.vars[VariableTypeEnum.INCREASE_START_DATE_AFTER_BACKUP] == "True"
 
     def set_start_date(self, start_date: datetime.datetime) -> None:
-        self.vars[VariableTypeEnum.START_DATE] = start_date.strftime("%Y-%m-%d %H:%M:%S")
-        self.update_var(VariableTypeEnum.START_DATE)
+        self.vars_manager.vars[VariableTypeEnum.START_DATE] = start_date.strftime("%Y-%m-%d %H:%M:%S")
+        self.vars_manager.update_var(VariableTypeEnum.START_DATE)
 
     def update_backuped_var(self):
         self.vars[VariableTypeEnum.BACKUPED_CHANNELS] = [channel.id for channel in self.backuped_channels]
         self.vars[VariableTypeEnum.BACKUPED_CATEGORIES] = [category.id for category in self.backuped_categories]
         self.update_var(VariableTypeEnum.BACKUPED_CHANNELS)
         self.update_var(VariableTypeEnum.BACKUPED_CATEGORIES)
-
-    def update_var(self, name : str):
-        if(not name in self.vars):
-            logging.getLogger().error(f"Can't update var {name} as it is not present in the dictionary!")
-            return
-        var_path = os.path.join("vars",f"{name}.json")
-        if(os.path.isfile(var_path)):
-            with open(var_path, "w", encoding="utf-8") as file:
-                file.write(json.dumps(self.vars[name]))
 
     def check_if_id_present(self, id : int):
         result = self.get_backuped_channel(id)
@@ -158,14 +121,14 @@ class Bot(commands.Bot):
                     logging.getLogger().warn(f"Channel {channel.id} already in backuped_channels")
                 else:
                     self.backuped_channels.append(channel)
-            self.update_var("backuped_channels")
+            self.vars_manager.update_var("backuped_channels")
         except Exception as e:
             logging.getLogger().exception(str(e))
 
     def channel_backuped(self, channel_id : str):
         target_filename = f"{channel_id}.json"
         
-        for root, dirs, files in os.walk(str(self.vars[VariableTypeEnum.BACKUP_PATH])):
+        for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
             if target_filename in files:
                 return True
 

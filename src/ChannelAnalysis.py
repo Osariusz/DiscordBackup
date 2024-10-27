@@ -53,3 +53,8 @@ class ChannelAnalysis():
     def number_of_messages(self) -> int:
         return len(self.messages_df)
     
+    def number_of_messages_per_channel(self) -> dict[int, int]:
+        cleaned_df = self.messages_df
+        cleaned_df.loc[cleaned_df["pinned"] == False, "pinned"] = None
+        cleaned_df.loc[cleaned_df["attachments"].str.len() == 0, "attachments"] = None
+        return cleaned_df.groupby("channel_id").count()

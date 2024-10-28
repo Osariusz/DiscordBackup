@@ -25,7 +25,7 @@ class Message():
                 thread_messages.append(new_message)
 
 
-        await self.message_data.copy_message_attributes(message, str(self.bot.vars[VariableTypeEnum.TIMEZONE]),thread_messages)
+        await self.message_data.copy_message_attributes(message, str(self.bot.vars_manager.vars[VariableTypeEnum.TIMEZONE]),thread_messages)
 
     def load_message_data(self, json_str):
         self.message_data = json.loads(json_str,object_hook=lambda d: SimpleNamespace(**d))

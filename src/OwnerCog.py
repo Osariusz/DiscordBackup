@@ -19,7 +19,7 @@ class OwnerCog(commands.Cog):
         self.bot = bot
 
     def cog_check(self, ctx: discord.ApplicationContext) -> bool:
-        result = ctx.author.id in self.bot.vars["allowed_users"]
+        result = ctx.author.id in self.bot.vars_manager.vars["allowed_users"]
         if not result:
             asyncio.create_task(ctx.respond("You are not allowed to use this command", ephemeral=True))
         return result

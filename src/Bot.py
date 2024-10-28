@@ -13,7 +13,7 @@ from Category import Category
 import logging
 from enum import Enum
 from VariableTypeEnum import VariableTypeEnum
-import VarsManager
+from VarsManager import VarsManager
 
 class Bot(commands.Bot):
 
@@ -86,11 +86,11 @@ class Bot(commands.Bot):
         return None
 
     async def load_backuped_ids(self):
-        if(VariableTypeEnum.BACKUPED_CHANNELS in self.vars):
-            for channel_id in self.vars[VariableTypeEnum.BACKUPED_CHANNELS]:
+        if(VariableTypeEnum.BACKUPED_CHANNELS in self.vars_manager.vars):
+            for channel_id in self.vars_manager.vars[VariableTypeEnum.BACKUPED_CHANNELS]:
                 await self.try_add_backuped_id(channel_id)
-        if(VariableTypeEnum.BACKUPED_CATEGORIES in self.vars):
-            for category_id in self.vars[VariableTypeEnum.BACKUPED_CATEGORIES]:
+        if(VariableTypeEnum.BACKUPED_CATEGORIES in self.vars_manager.vars):
+            for category_id in self.vars_manager.vars[VariableTypeEnum.BACKUPED_CATEGORIES]:
                 await self.try_add_backuped_id(category_id)
 
     def get_start_date_update_after_backup(self) -> bool:
@@ -101,10 +101,10 @@ class Bot(commands.Bot):
         self.vars_manager.update_var(VariableTypeEnum.START_DATE)
 
     def update_backuped_var(self):
-        self.vars[VariableTypeEnum.BACKUPED_CHANNELS] = [channel.id for channel in self.backuped_channels]
-        self.vars[VariableTypeEnum.BACKUPED_CATEGORIES] = [category.id for category in self.backuped_categories]
-        self.update_var(VariableTypeEnum.BACKUPED_CHANNELS)
-        self.update_var(VariableTypeEnum.BACKUPED_CATEGORIES)
+        self.vars_manager.vars[VariableTypeEnum.BACKUPED_CHANNELS] = [channel.id for channel in self.backuped_channels]
+        self.vars_manager.vars[VariableTypeEnum.BACKUPED_CATEGORIES] = [category.id for category in self.backuped_categories]
+        self.vars_manager.update_var(VariableTypeEnum.BACKUPED_CHANNELS)
+        self.vars_manager.update_var(VariableTypeEnum.BACKUPED_CATEGORIES)
 
     def check_if_id_present(self, id : int):
         result = self.get_backuped_channel(id)
@@ -170,13 +170,13 @@ class Bot(commands.Bot):
             logging.info(f"Id already present {id}")
             return False
         if(isinstance(discord_channel,discord.CategoryChannel)):
-            bot_category = Category(self, self.vars[VariableTypeEnum.BACKUP_PATH])
+            bot_category = Category(self, self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])
             bot_category.copy_from_category(discord_channel)
             self.backuped_categories.append(bot_category)
             self.update_backuped_var()
             return True
         elif(isinstance(discord_channel,discord.TextChannel)):
-            bot_channel = Channel(self, self.vars[VariableTypeEnum.BACKUP_PATH])
+            bot_channel = Channel(self, self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])
             bot_channel.copy_from_channel(discord_channel)
             self.backuped_channels.append(bot_channel)
             self.update_backuped_var()

@@ -19,9 +19,21 @@ class ChannelAnalysis():
     def initialize_channel_analysis(self, content_matters: bool):
         logging.getLogger().info(f"Initializing channel analysis")
         self.channels_messages: dict[Channel, list[Message]] = {}
-        for channel_id, channel_json in self.get_from_all_channels().items():
-            channel: Channel = Channel(None, str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH]))
+        for channel_path in self.get_all_channels():
+            
+            channel_file_name = channel_path.split(os.sep)[-1]
+            channel_id = os.path.splitext(channel_file_name)[0]
+            logging.getLogger().info(f"Loading channel {channel_id}")
+            channel: Channel = Channel(None, str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])) 
             channel.id = int(channel_id)
+            channel_json = ""
+
+            try:
+                with open(channel_path, 'r', encoding='utf-8') as json_file:
+                    channel_json = json_file.read()
+            except Exception as e:
+                logging.getLogger().error(f"Error reading {channel_path}: {e}")
+
             channel.load_messages(channel_json)
 
             if(not content_matters):
@@ -34,20 +46,16 @@ class ChannelAnalysis():
         self.initialize_messages_df()
         logging.getLogger().info(f"Initialized channel analysis")
 
-    def get_from_all_channels(self) -> dict[str, str]:
+    def get_all_channels(self) -> list[str]:
         logging.getLogger().info(f"Getting from all channels")
-        result: dict[str, str] = {}
+        result: list[str] = []
         for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
             for file in files:
                 name_split = os.path.splitext(file)
                 root_split = root.split(os.sep)
                 if(name_split[1] == ".json" and root_split[-1] == name_split[0]):
                     file_path = os.path.join(root, file)
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as json_file:
-                            result[name_split[0]] = json_file.read()
-                    except Exception as e:
-                        logging.getLogger().error(f"Error reading {file_path}: {e}")
+                    result.append(file_path)
         logging.getLogger().info(f"Got from all channels")
         return result
         

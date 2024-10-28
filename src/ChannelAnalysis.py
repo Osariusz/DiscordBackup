@@ -61,14 +61,13 @@ class ChannelAnalysis():
         
     def initialize_messages_df(self):
         logging.getLogger().info(f"Initializing messages df")
-        all_messages = []
-        for channel, messages in self.channels_messages.items():
-            for message in messages:
-                message_json: str = json.dumps(message, cls=CustomEncoder)
-                message_dict: dict = json.loads(message_json)
-                message_dict['channel_id'] = channel.id
-                all_messages.append(message_dict)
-        self.messages_df = pd.DataFrame(all_messages)
+        message_generator = (
+            {**json.loads(json.dumps(message, cls=CustomEncoder)), 'channel_id': channel.id}
+            for channel, messages in self.channels_messages.items()
+            for message in messages
+        )
+
+        self.messages_df = pd.DataFrame(message_generator)
         self.messages_df.loc[self.messages_df["pinned"] == False, "pinned"] = None
         self.messages_df.loc[self.messages_df["attachments"].str.len() == 0, "attachments"] = None
         logging.getLogger().info(f"Initialized messages df")

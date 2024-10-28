@@ -19,7 +19,7 @@ class Plotting():
             6: 'Sunday'
         }
         df["weekday_name"] = df.index.to_series().replace(day_dict)
-        df.plot(x="weekday_name", xlabel="Weekday", y="content", ylabel="Messages", title="Sent messages by weekday")
+        df.plot(x="weekday_name", xlabel="Weekday", y="created_at", ylabel="Messages", title="Sent messages by weekday")
 
         plot_filename = self.TEMP_PLOT_NAME
         plt.savefig(plot_filename)

@@ -10,17 +10,24 @@ from VarsManager import VarsManager
 
 class ChannelAnalysis():
 
-    def __init__(self):
+    def __init__(self, content_matters: bool = False):
         self.vars_manager = VarsManager()
-        self.initialize_channel_analysis()
+        self.initialize_channel_analysis(content_matters)
         self.current_channels: list[int] | None = None
 
-    def initialize_channel_analysis(self):
+    def initialize_channel_analysis(self, content_matters: bool):
         self.channels_messages: dict[Channel, list[Message]] = {}
         for channel_id, channel_json in self.get_from_all_channels().items():
             channel: Channel = Channel(None, str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH]))
             channel.id = int(channel_id)
             channel.load_messages(channel_json)
+
+            if(not content_matters):
+                def remove_message_content(msg: Message):
+                    msg.message_data.content = ""
+                    return msg
+                channel.messages = [remove_message_content(msg) for msg in channel.messages]
+                
             self.channels_messages[channel] = channel.messages
         self.initialize_messages_df()
 
@@ -53,6 +60,9 @@ class ChannelAnalysis():
 
     def restrict_to_channels(self, channels_ids: list[int]):
         self.current_channels = channels_ids
+    
+    def set_content_matters(self, content_matters: bool):
+        self.content_matters = content_matters
 
     def copy_messages_df_current_channels(self) -> pd.DataFrame:
         new_df = self.messages_df.copy()

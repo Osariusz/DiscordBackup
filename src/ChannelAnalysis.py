@@ -72,6 +72,5 @@ class ChannelAnalysis():
         cleaned_df["created_at"] = pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S.%f%z", errors='coerce').fillna(
                 pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S%z", errors='coerce')
             )
-        print(cleaned_df['created_at'].to_string())
         cleaned_df["weekday"] = cleaned_df['created_at'].dt.weekday
         return cleaned_df.groupby("weekday").count()

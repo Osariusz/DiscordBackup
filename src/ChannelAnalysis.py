@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from Channel import Channel
@@ -12,6 +13,7 @@ class ChannelAnalysis():
     def __init__(self):
         self.vars_manager = VarsManager()
         self.initialize_channel_analysis()
+        self.current_channels: list[int] | None = None
 
     def initialize_channel_analysis(self):
         self.channels_messages: dict[Channel, list[Message]] = {}
@@ -22,22 +24,6 @@ class ChannelAnalysis():
             self.channels_messages[channel] = channel.messages
         self.initialize_messages_df()
 
-    def get_from_channel_id(self, channel_id: str) -> str:
-        filename = f"{channel_id}.json"
-        
-        for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
-            if filename in files:
-                file_path = os.path.join(root, filename)
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as json_file:
-                        return json_file.read()
-                except Exception as e:
-                    print(f"Error reading {file_path}: {e}")
-                    return ""
-        
-        print(f"File {filename} not found")
-        return ""
-    
     def get_from_all_channels(self) -> dict[str, str]:
         result: dict[str, str] = {}
         for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
@@ -58,16 +44,34 @@ class ChannelAnalysis():
             for message in messages:
                 message_json: str = json.dumps(message, cls=CustomEncoder)
                 message_dict: dict = json.loads(message_json)
-                message_dict['channel_id'] = channel.id 
+                message_dict['channel_id'] = channel.id
                 all_messages.append(message_dict)
         self.messages_df = pd.DataFrame(all_messages)
+        self.messages_df.loc[self.messages_df["pinned"] == False, "pinned"] = None
+        self.messages_df.loc[self.messages_df["attachments"].str.len() == 0, "attachments"] = None
 
-    # All operations should be done on messages_df
+    def restrict_to_channels(self, channels_ids: list[int]):
+        self.current_channels = channels_ids
+
+    def copy_messages_df_current_channels(self) -> pd.DataFrame:
+        new_df = self.messages_df.copy()
+        if(self.current_channels is None):
+            return new_df
+        return new_df[new_df["channel_id"].isin(self.current_channels)]
+
+    # All operations should be done on copy_messages_df_current_channels
     def number_of_messages(self) -> int:
-        return len(self.messages_df)
+        return len(self.copy_messages_df_current_channels())
     
-    def number_of_messages_per_channel(self) -> dict[int, int]:
-        cleaned_df = self.messages_df
-        cleaned_df.loc[cleaned_df["pinned"] == False, "pinned"] = None
-        cleaned_df.loc[cleaned_df["attachments"].str.len() == 0, "attachments"] = None
+    def number_of_messages_per_channel(self):
+        cleaned_df = self.copy_messages_df_current_channels()
         return cleaned_df.groupby("channel_id").count()
+    
+    def weekday_number_of_messages(self):
+        cleaned_df = self.copy_messages_df_current_channels()
+        cleaned_df["created_at"] = pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S.%f%z", errors='coerce').fillna(
+                pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S%z", errors='coerce')
+            )
+        print(cleaned_df['created_at'].to_string())
+        cleaned_df["weekday"] = cleaned_df['created_at'].dt.weekday
+        return cleaned_df.groupby("weekday").count()

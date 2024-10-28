@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import os
 from Channel import Channel
 import pandas as pd
@@ -16,6 +17,7 @@ class ChannelAnalysis():
         self.current_channels: list[int] | None = None
 
     def initialize_channel_analysis(self, content_matters: bool):
+        logging.getLogger().info(f"Initializing channel analysis")
         self.channels_messages: dict[Channel, list[Message]] = {}
         for channel_id, channel_json in self.get_from_all_channels().items():
             channel: Channel = Channel(None, str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH]))
@@ -27,11 +29,13 @@ class ChannelAnalysis():
                     msg.message_data.content = ""
                     return msg
                 channel.messages = [remove_message_content(msg) for msg in channel.messages]
-                
+
             self.channels_messages[channel] = channel.messages
         self.initialize_messages_df()
+        logging.getLogger().info(f"Initialized channel analysis")
 
     def get_from_all_channels(self) -> dict[str, str]:
+        logging.getLogger().info(f"Getting from all channels")
         result: dict[str, str] = {}
         for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
             for file in files:
@@ -43,10 +47,12 @@ class ChannelAnalysis():
                         with open(file_path, 'r', encoding='utf-8') as json_file:
                             result[name_split[0]] = json_file.read()
                     except Exception as e:
-                        print(f"Error reading {file_path}: {e}")
+                        logging.getLogger().error(f"Error reading {file_path}: {e}")
+        logging.getLogger().info(f"Got from all channels")
         return result
         
     def initialize_messages_df(self):
+        logging.getLogger().info(f"Initializing messages df")
         all_messages = []
         for channel, messages in self.channels_messages.items():
             for message in messages:
@@ -57,6 +63,7 @@ class ChannelAnalysis():
         self.messages_df = pd.DataFrame(all_messages)
         self.messages_df.loc[self.messages_df["pinned"] == False, "pinned"] = None
         self.messages_df.loc[self.messages_df["attachments"].str.len() == 0, "attachments"] = None
+        logging.getLogger().info(f"Initialized messages df")
 
     def restrict_to_channels(self, channels_ids: list[int]):
         self.current_channels = channels_ids
@@ -65,6 +72,7 @@ class ChannelAnalysis():
         self.content_matters = content_matters
 
     def copy_messages_df_current_channels(self) -> pd.DataFrame:
+        logging.getLogger().info(f"Copying messages from current channels")
         new_df = self.messages_df.copy()
         if(self.current_channels is None):
             return new_df
@@ -79,6 +87,7 @@ class ChannelAnalysis():
         return cleaned_df.groupby("channel_id").count()
     
     def weekday_number_of_messages(self):
+        logging.getLogger().info(f"Getting number of messages by week day")
         cleaned_df = self.copy_messages_df_current_channels()
         cleaned_df["created_at"] = pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S.%f%z", errors='coerce').fillna(
                 pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S%z", errors='coerce')

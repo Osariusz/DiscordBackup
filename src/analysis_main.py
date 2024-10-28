@@ -1,11 +1,12 @@
+import logging
+from fastapi import FastAPI, responses
+import uvicorn
+
 from ChannelAnalysis import ChannelAnalysis
 from Plotting import Plotting
-from fastapi import FastAPI, responses
-from fastapi.responses import StreamingResponse
-import matplotlib.pyplot as plt
-import numpy as np
-from io import BytesIO
-from flask import Flask, send_file
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app = FastAPI()
 
@@ -17,5 +18,5 @@ async def get_plot():
     return responses.FileResponse(plot_file)
 
 if __name__ == "__main__":
-    import uvicorn
+    logging.info("Starting the analysis")
     uvicorn.run(app, host="0.0.0.0", port=8000)

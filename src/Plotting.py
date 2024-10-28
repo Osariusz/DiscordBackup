@@ -1,3 +1,4 @@
+import logging
 from ChannelAnalysis import ChannelAnalysis
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,6 +9,7 @@ class Plotting():
     TEMP_PLOT_NAME: str = "TEMP_PLOT.png"
 
     def plot_messages_weekday(self, channel_analysis: ChannelAnalysis) -> str:
+        logging.getLogger().info(f"Plotting messages weekday")
         df: pd.DataFrame = channel_analysis.weekday_number_of_messages().copy()
         day_dict = {
             0: 'Monday',

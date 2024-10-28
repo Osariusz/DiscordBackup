@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.bot
     env_file: "./src/.env"
     volumes:
-      - ${BACKUP_PATH}:${MOUNT_PATH}
+      - ${MOUNT_PATH}:${BACKUP_PATH}
 
   python-analytics:
     build:
@@ -15,4 +15,4 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ${BACKUP_PATH}:${MOUNT_PATH}
+      - ${MOUNT_PATH}:${BACKUP_PATH}

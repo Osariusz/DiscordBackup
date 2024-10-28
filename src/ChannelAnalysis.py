@@ -29,7 +29,8 @@ class ChannelAnalysis():
         for root, dirs, files in os.walk(str(self.vars_manager.vars[VariableTypeEnum.BACKUP_PATH])):
             for file in files:
                 name_split = os.path.splitext(file)
-                if(name_split[1] == ".json"):
+                root_split = root.split(os.sep)
+                if(name_split[1] == ".json" and root_split[-1] == name_split[0]):
                     file_path = os.path.join(root, file)
                     try:
                         with open(file_path, 'r', encoding='utf-8') as json_file:

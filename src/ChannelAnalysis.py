@@ -11,9 +11,12 @@ from VarsManager import VarsManager
 
 class ChannelAnalysis():
 
-    def __init__(self, content_matters: bool = False):
+    def __init__(self, content_matters: bool = False, message_df: pd.DataFrame | None = None):
         self.vars_manager = VarsManager()
-        self.initialize_channel_analysis(content_matters)
+        if(message_df is None):
+            self.initialize_channel_analysis(content_matters)
+        else:
+            self.messages_df = message_df
         self.current_channels: list[int] | None = None
 
     def initialize_channel_analysis(self, content_matters: bool):

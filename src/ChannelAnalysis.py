@@ -13,14 +13,15 @@ class ChannelAnalysis():
 
     def __init__(self, content_matters: bool = False, message_df: pd.DataFrame | None = None):
         self.vars_manager = VarsManager()
+        self.current_channels: list[int] | None = None
         if(message_df is None):
             self.initialize_channel_analysis(content_matters)
         else:
             self.messages_df = message_df
-        self.current_channels: list[int] | None = None
 
     def initialize_channel_analysis(self, content_matters: bool):
         logging.getLogger().info(f"Initializing channel analysis")
+        self.current_channels = []
         self.channels_messages: dict[Channel, list[Message]] = {}
         for channel_path in self.get_all_channels():
             
@@ -37,6 +38,7 @@ class ChannelAnalysis():
             except Exception as e:
                 logging.getLogger().error(f"Error reading {channel_path}: {e}")
 
+            self.current_channels.append(channel.id)
             channel.load_messages(channel_json)
 
             if(not content_matters):

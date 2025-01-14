@@ -20,7 +20,7 @@ async def get_plot():
         channel_analysis.restrict_to_channels([channel])
         all_channel_analysis.append(channel_analysis)
     plotting: Plotting = Plotting()
-    plot_file: str = plotting.plot_messages_percent_weekday(all_channel_analysis)
+    plot_file: str = plotting.plot_messages_percent_weekday([main_channel_analysis])
     return responses.FileResponse(plot_file)
 
 if __name__ == "__main__":

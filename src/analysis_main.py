@@ -4,6 +4,7 @@ import uvicorn
 
 from ChannelAnalysis import ChannelAnalysis
 from Plotting import Plotting
+from typing import Callable
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -11,20 +12,24 @@ logging.basicConfig(level=logging.INFO,
 app = FastAPI()
 main_channel_analysis: ChannelAnalysis
 
-@app.get('/plot')
-async def get_plot():
-    channels = []
+def get_plot(channels: list[int], plot_function):
     all_channel_analysis: list[ChannelAnalysis] = []
     for channel in channels:
         channel_analysis: ChannelAnalysis = ChannelAnalysis(message_df=main_channel_analysis.messages_df)
         channel_analysis.restrict_to_channels([channel])
         all_channel_analysis.append(channel_analysis)
-    plotting: Plotting = Plotting()
-    plot_file: str = plotting.plot_messages_percent_weekday(all_channel_analysis)
+    plot_file: str = plot_function(all_channel_analysis)
     return responses.FileResponse(plot_file)
 
-@app.get('/plot_all')
-async def get_plot():
+@app.get('/plot_weekday')
+async def get_plot_weekday():
+    channels: list[int] = []
+    plotting: Plotting = Plotting()
+    result: str = get_plot(channels, plotting.plot_messages_percent_weekday)
+    return result
+
+@app.get('/plot_weekday_all')
+async def get_plot_weekday_all():
     plotting: Plotting = Plotting()
     plot_file: str = plotting.plot_messages_percent_weekday([main_channel_analysis])
     return responses.FileResponse(plot_file)

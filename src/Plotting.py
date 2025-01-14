@@ -71,3 +71,23 @@ class Plotting():
         plt.close()
 
         return plot_filename
+    
+    def plot_message_count_day(self, all_channel_analysis: list[ChannelAnalysis]) -> str:
+        logging.getLogger().info(f"Plotting message count by day")
+        dfs: dict[str, pd.Series] = {}
+        for channel_analysis in all_channel_analysis:
+            df: pd.DataFrame = channel_analysis.day_number_of_messages().copy()
+            creation_date_series = df["created_at"].value_counts()
+            creation_date_series = creation_date_series.sort_index()
+            if(channel_analysis.current_channels is not None):
+                dfs[str(channel_analysis.current_channels)] = creation_date_series
+
+        ax = None
+        for channels, series in dfs.items():
+            ax = series.plot(ax=ax,x="created_at", xlabel="Message day", y="count", ylabel="Count", label=f"{channels}", legend=False)
+
+        plot_filename = self.TEMP_PLOT_NAME
+        plt.savefig(plot_filename)
+        plt.close()
+
+        return plot_filename

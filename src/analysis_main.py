@@ -28,10 +28,23 @@ async def get_plot_weekday():
     result: str = get_plot(channels, plotting.plot_messages_percent_weekday)
     return result
 
+@app.get('/plot_date')
+async def get_plot_day():
+    channels: list[int] = []
+    plotting: Plotting = Plotting()
+    result: str = get_plot(channels, plotting.plot_message_count_day)
+    return result
+
 @app.get('/plot_weekday_all')
 async def get_plot_weekday_all():
     plotting: Plotting = Plotting()
     plot_file: str = plotting.plot_messages_percent_weekday([main_channel_analysis])
+    return responses.FileResponse(plot_file)
+
+@app.get('/plot_date_all')
+async def get_plot_date_all():
+    plotting: Plotting = Plotting()
+    plot_file: str = plotting.plot_message_count_day([main_channel_analysis])
     return responses.FileResponse(plot_file)
 
 if __name__ == "__main__":

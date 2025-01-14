@@ -21,7 +21,8 @@ class ChannelAnalysis():
 
     def initialize_channel_analysis(self, content_matters: bool):
         logging.getLogger().info(f"Initializing channel analysis")
-        self.current_channels = []
+        if self.current_channels is None:
+            self.current_channels = []
         self.channels_messages: dict[Channel, list[Message]] = {}
         for channel_path in self.get_all_channels():
             
@@ -38,7 +39,8 @@ class ChannelAnalysis():
             except Exception as e:
                 logging.getLogger().error(f"Error reading {channel_path}: {e}")
 
-            self.current_channels.append(channel.id)
+            if self.current_channels is None:
+                self.current_channels.append(channel.id)
             channel.load_messages(channel_json)
 
             if(not content_matters):
@@ -106,3 +108,13 @@ class ChannelAnalysis():
             )
         cleaned_df["weekday"] = cleaned_df['created_at'].dt.weekday
         return cleaned_df.groupby("weekday").count()
+    
+    def day_number_of_messages(self):
+        logging.getLogger().info(f"Getting number of messages by day")
+        cleaned_df = self.copy_messages_df_current_channels()
+        cleaned_df["created_at"] = pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S.%f%z", errors='coerce').fillna(
+                pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S%z", errors='coerce')
+            ).dt.date
+        #cleaned_df.sort_values(by="created_at")
+        #cleaned_df["created_at"] = cleaned_df["created_at"].dt.strftime("%d.%m.%Y")
+        return cleaned_df

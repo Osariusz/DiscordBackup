@@ -31,9 +31,11 @@ async def get_plot_weekday():
 @app.get('/plot_date')
 async def get_plot_day():
     channels: list[int] = []
+    channel_analysis: ChannelAnalysis = ChannelAnalysis(message_df=main_channel_analysis.messages_df)
+    channel_analysis.restrict_to_channels(channels)
     plotting: Plotting = Plotting()
-    result: str = get_plot(channels, plotting.plot_message_count_day)
-    return result
+    plot_file: str = plotting.plot_message_count_day_CURRENTLY_ONE_SUBPLOT(channel_analysis)
+    return responses.FileResponse(plot_file)
 
 @app.get('/plot_weekday_all')
 async def get_plot_weekday_all():
@@ -44,7 +46,7 @@ async def get_plot_weekday_all():
 @app.get('/plot_date_all')
 async def get_plot_date_all():
     plotting: Plotting = Plotting()
-    plot_file: str = plotting.plot_message_count_day([main_channel_analysis])
+    plot_file: str = plotting.plot_message_count_day_CURRENTLY_ONE_SUBPLOT(main_channel_analysis)
     return responses.FileResponse(plot_file)
 
 if __name__ == "__main__":

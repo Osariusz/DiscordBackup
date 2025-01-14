@@ -109,6 +109,16 @@ class ChannelAnalysis():
         cleaned_df["weekday"] = cleaned_df['created_at'].dt.weekday
         return cleaned_df.groupby("weekday").count()
     
+    def strftime_number_of_messages(self, strftime: str):
+        logging.getLogger().info(f"Getting number of messages by day")
+        cleaned_df = self.copy_messages_df_current_channels()
+        cleaned_df["created_at"] = pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S.%f%z", errors='coerce').fillna(
+                pd.to_datetime(cleaned_df["created_at"], utc=True, format="%Y-%m-%d %H:%M:%S%z", errors='coerce')
+            ).dt.date
+        #cleaned_df.sort_values(by="created_at")
+        #cleaned_df["created_at"] = cleaned_df["created_at"].dt.strftime("%d.%m.%Y")
+        return cleaned_df
+
     def day_number_of_messages(self):
         logging.getLogger().info(f"Getting number of messages by day")
         cleaned_df = self.copy_messages_df_current_channels()

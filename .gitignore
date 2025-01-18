@@ -137,3 +137,5 @@ log.txt
 .idea/
 
 TEMP_PLOT.png
+
+src/LoreInfo.py

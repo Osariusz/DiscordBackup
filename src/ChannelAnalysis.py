@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import os
+from typing import Self
 from Channel import Channel
 import pandas as pd
 from CustomEncoder import CustomEncoder
@@ -17,7 +18,12 @@ class ChannelAnalysis():
         if(message_df is None):
             self.initialize_channel_analysis(content_matters)
         else:
-            self.messages_df = message_df
+            self.messages_df: pd.DataFrame = message_df
+    
+    def from_channel_analysis(channel_analysis: Self) -> Self:
+        result: Self = ChannelAnalysis(message_df=channel_analysis.messages_df.copy())
+        result.current_channels = channel_analysis.current_channels.copy()
+        return result
 
     def initialize_channel_analysis(self, content_matters: bool):
         logging.getLogger().info(f"Initializing channel analysis")
@@ -39,8 +45,7 @@ class ChannelAnalysis():
             except Exception as e:
                 logging.getLogger().error(f"Error reading {channel_path}: {e}")
 
-            if self.current_channels is None:
-                self.current_channels.append(channel.id)
+            self.current_channels.append(channel.id)
             channel.load_messages(channel_json)
 
             if(not content_matters):
@@ -81,6 +86,9 @@ class ChannelAnalysis():
 
     def restrict_to_channels(self, channels_ids: list[int]):
         self.current_channels = channels_ids
+    
+    def remove_channels_from_current(self, channels_ids: list[int]):
+        self.current_channels = [channel for channel in self.current_channels if not channel in channels_ids]
     
     def set_content_matters(self, content_matters: bool):
         self.content_matters = content_matters

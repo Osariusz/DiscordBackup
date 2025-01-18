@@ -6,3 +6,5 @@ class VariableTypeEnum:
     START_DATE = "start_date"
     TIMEZONE = "timezone"
     BACKUP_PATH = "backup_path"
+    CHANNEL_NAMES = "channel_names"
+    USER_NICKNAMES = "user_nicknames"

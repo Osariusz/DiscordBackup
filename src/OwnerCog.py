@@ -170,4 +170,12 @@ class OwnerCog(commands.Cog):
         else:
             await ctx.respond(f"There is no backuped channel with id {channel_id}")
 
-    
+    @discord.command()
+    async def update_channel_names(self, ctx: discord.ApplicationContext):
+        self.bot.set_channel_names(ctx.guild.id)
+        await ctx.respond(f"Updated channel names")
+
+    @discord.command()
+    async def update_user_names(self, ctx: discord.ApplicationContext):
+        await self.bot.set_user_nicknames(ctx.guild.id)
+        await ctx.respond(f"Updated user names")

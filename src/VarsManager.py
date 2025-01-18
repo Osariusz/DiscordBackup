@@ -48,6 +48,6 @@ class VarsManager():
             logging.getLogger().error(f"Can't update var {name} as it is not present in the dictionary!")
             return
         var_path = os.path.join("vars",f"{name}.json")
-        if(os.path.isfile(var_path)):
-            with open(var_path, "w", encoding="utf-8") as file:
-                file.write(json.dumps(self.vars[name]))
+        #if(os.path.isfile(var_path)):
+        with open(var_path, "w", encoding="utf-8") as file:
+            file.write(json.dumps(self.vars[name]))

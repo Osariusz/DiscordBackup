@@ -2,6 +2,7 @@ import datetime
 import shutil
 from time import sleep
 from tokenize import String
+from typing import Dict
 import discord
 from Channel import Channel
 from OwnerCog import OwnerCog
@@ -99,6 +100,27 @@ class Bot(commands.Bot):
     def set_start_date(self, start_date: datetime.datetime) -> None:
         self.vars_manager.vars[VariableTypeEnum.START_DATE] = start_date.strftime("%Y-%m-%d %H:%M:%S")
         self.vars_manager.update_var(VariableTypeEnum.START_DATE)
+
+    def set_channel_names(self, guild_id: int) -> None:
+        guild = self.get_guild(guild_id)
+        if guild is None:
+            raise ValueError(f"Guild with ID {guild_id} not found.")
+
+        channel_dict: Dict[int, str] = {channel.id: channel.name for channel in guild.channels}
+        self.vars_manager.vars[VariableTypeEnum.CHANNEL_NAMES] = channel_dict
+        self.vars_manager.update_var(VariableTypeEnum.CHANNEL_NAMES)
+
+    async def set_user_nicknames(self, guild_id: int) -> None:
+        guild = self.get_guild(guild_id)  
+        if guild is None:
+            raise ValueError(f"Guild with ID {guild_id} not found.")
+
+        await guild.fetch_members().flatten()
+
+        user_dict: Dict[int, str] = {member.id: (member.nick or member.name) for member in guild.members}
+        self.vars_manager.vars[VariableTypeEnum.USER_NICKNAMES] = user_dict
+        self.vars_manager.update_var(VariableTypeEnum.USER_NICKNAMES)
+
 
     def update_backuped_var(self):
         self.vars_manager.vars[VariableTypeEnum.BACKUPED_CHANNELS] = [channel.id for channel in self.backuped_channels]

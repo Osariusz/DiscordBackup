@@ -16,7 +16,7 @@ if(__name__ == "__main__"):
 
     load_dotenv()
 
-    intents = discord.Intents.default()
+    intents = discord.Intents.all()
     intents.message_content = True
 
     bot = Bot(intents)

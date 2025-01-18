@@ -1,0 +1,10 @@
+
+regions: dict[str, list[str]] = {
+    "polska": ["polsk"]
+}
+
+bot_users = [2137]
+
+lore_channels: list[int] = [769]
+
+human_countries = ["niemcy"]
